@@ -14,7 +14,7 @@ import java.util.Formatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NewtworkSwitch {
+public class NetworkSwitch {
 	private String hostname;
 	private int port;
 	private String username;
@@ -26,9 +26,8 @@ public class NewtworkSwitch {
 	private String hash;
 	private static State state;
 
-	public NewtworkSwitch(String host, int port, String username,
-			String password) throws UnknownHostException, IOException {
-		logger = LoggerFactory.getLogger(NewtworkSwitch.class);
+	public NetworkSwitch(String host, int port, String username, String password) {
+		logger = LoggerFactory.getLogger(NetworkSwitch.class);
 		this.hostname = host;
 		this.port = port;
 		this.username = username;
@@ -45,16 +44,20 @@ public class NewtworkSwitch {
 		}
 	}
 
-	public void send(String lights) throws IOException, NetIOException {
+	public void send(String lights) throws NetIOException {
 		if (!lights.matches("^[01iu]{4}$"))
 			throw new NetIOException("Invalid Format");
-		if (state != State.AUTHORIZED) {
-			login();
+		try {
+			if (state != State.AUTHORIZED) {
+				login();
+			}
+			writer.write("port list " + lights);
+			writer.newLine();
+			writer.flush();
+			logger.debug(reader.readLine());
+		} catch (IOException e) {
+			throw new NetIOException(e);
 		}
-		writer.write("port list " + lights);
-		writer.newLine();
-		writer.flush();
-		logger.debug(reader.readLine());
 	}
 
 	private State login() {
@@ -66,28 +69,27 @@ public class NewtworkSwitch {
 				if (result == State.CONNECTED)
 					result = loginSendCredentials();
 			}
-		} catch (UnknownHostException e) {
-			logger.error("Could not connect to " + hostname + ":" + port + ": "
-					+ e.getMessage());
-		} catch (IOException e) {
-			logger.error("Could not connect to " + hostname + ":" + port + ": "
-					+ e.getMessage());
-		} catch (NoSuchAlgorithmException e) {
+		} catch (NetIOException e) {
 			logger.error("Could not connect to " + hostname + ":" + port + ": "
 					+ e.getMessage());
 		}
 		return result;
 	}
 
-	private State loginSendCredentials() throws NoSuchAlgorithmException,
-			IOException {
+	private State loginSendCredentials() throws NetIOException {
 		State result = State.CONNECTED;
-		writer.write("clogin " + username + " " + getPassword());
-		writer.newLine();
-		writer.flush();
-		String line = reader.readLine();
-		if (line.startsWith("250")) {
-			result = State.AUTHORIZED;
+		try {
+			writer.write("clogin " + username + " " + getPassword());
+			writer.newLine();
+			writer.flush();
+			String line = reader.readLine();
+			if (line.startsWith("250")) {
+				result = State.AUTHORIZED;
+			}
+		} catch (NoSuchAlgorithmException e) {
+			throw new NetIOException(e);
+		} catch (IOException e) {
+			throw new NetIOException(e);
 		}
 		return result;
 	}
@@ -98,19 +100,25 @@ public class NewtworkSwitch {
 				.getBytes()));
 	}
 
-	private State loginConnect() throws UnknownHostException, IOException {
+	private State loginConnect() throws NetIOException {
 		logger.debug("connect");
 		State result = State.DISCONNECTED;
-		socket = new Socket(hostname, port);
-		reader = new BufferedReader(new InputStreamReader(
-				socket.getInputStream()));
-		writer = new BufferedWriter(new OutputStreamWriter(
-				socket.getOutputStream()));
-		String line = reader.readLine();
-		if (line.startsWith("100")) {
-			hash = line.substring(10, 18);
-			logger.debug("Got Hash: " + hash);
-			result = State.CONNECTED;
+		try {
+			socket = new Socket(hostname, port);
+			reader = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
+			writer = new BufferedWriter(new OutputStreamWriter(
+					socket.getOutputStream()));
+			String line = reader.readLine();
+			if (line.startsWith("100")) {
+				hash = line.substring(10, 18);
+				logger.debug("Got Hash: " + hash);
+				result = State.CONNECTED;
+			}
+		} catch (UnknownHostException e) {
+			throw new NetIOException(e);
+		} catch (IOException e) {
+			throw new NetIOException(e);
 		}
 		return result;
 	}
@@ -125,5 +133,33 @@ public class NewtworkSwitch {
 		formatter.close();
 
 		return sb.toString();
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }
