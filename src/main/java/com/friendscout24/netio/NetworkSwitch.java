@@ -60,7 +60,11 @@ public class NetworkSwitch {
             writer.write("port list " + lights);
             writer.newLine();
             writer.flush();
-            logger.debug(reader.readLine());
+            StringBuffer response = new StringBuffer();
+            while (reader.ready()) {
+                response.append(reader.read());
+            }
+            logger.debug(response.toString());
         } catch (IOException e) {
             throw new NetIOException(e);
         }
