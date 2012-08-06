@@ -66,6 +66,7 @@ public class NetworkSwitch {
             }
             logger.debug(response.toString());
         } catch (IOException e) {
+            state = State.DISCONNECTED;
             throw new NetIOException(e);
         }
     }
