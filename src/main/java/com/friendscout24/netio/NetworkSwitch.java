@@ -50,7 +50,7 @@ public class NetworkSwitch {
     }
 
 
-    public void send(String lights) throws NetIOException {
+    public void send(String lights) throws NetIOException, IOException {
         if (!lights.matches("^[01iu]{4}$"))
             throw new NetIOException("Invalid Format");
         try {
@@ -66,6 +66,7 @@ public class NetworkSwitch {
             }
             logger.debug(response.toString());
         } catch (IOException e) {
+            socket.close();
             state = State.DISCONNECTED;
             throw new NetIOException(e);
         }
