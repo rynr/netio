@@ -15,46 +15,42 @@ import java.util.Formatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 
 public class NetworkSwitch {
 
+    @Inject
+    @Named("PowerSwitch Hostname")
     private String         hostname;
-    private int            port;
+    @Inject
+    @Named("PowerSwitch Port")
+    private Integer        port;
+    @Inject
+    @Named("PowerSwitch Username")
     private String         username;
+    @Inject
+    @Named("PowerSwitch Password")
     private String         password;
     private Socket         socket;
     private Logger         logger;
     private BufferedReader reader;
     private BufferedWriter writer;
     private String         hash;
-    private static State   state;
 
 
-    public NetworkSwitch(String host, int port, String username, String password) {
+    @Inject
+    public NetworkSwitch() {
         logger = LoggerFactory.getLogger(NetworkSwitch.class);
-        this.hostname = host;
-        this.port = port;
-        this.username = username;
-        this.password = password;
     }
 
 
-    public void noop() throws IOException {
-        // Only sending command if authorized
-        if (state == State.AUTHORIZED) {
-            writer.write("noop");
-            writer.newLine();
-            writer.flush();
-            // There's no response for noop
-        }
-    }
-
-
-    public void send(String lights) throws NetIOException, IOException {
+    public void send(String lights) throws NetIOException {
         if (!lights.matches("^[01iu]{4}$"))
             throw new NetIOException("Invalid Format");
         try {
-            if (state != State.AUTHORIZED) {
+            if (socket == null || !socket.isConnected()) {
                 login();
             }
             writer.write("port list " + lights);
@@ -66,45 +62,43 @@ public class NetworkSwitch {
             }
             logger.debug(response.toString());
         } catch (IOException e) {
-            socket.close();
-            state = State.DISCONNECTED;
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                logger.error("Error closing Socket on Exception (" + e.getMessage(), e1);
+            }
             throw new NetIOException(e);
         }
     }
 
 
-    private State login() {
-        State result = State.DISCONNECTED;
+    private void login() {
         logger.debug("login()");
         try {
             if (socket == null || !socket.isConnected()) {
-                result = loginConnect();
-                if (result == State.CONNECTED)
-                    result = loginSendCredentials();
+                loginConnect();
+                loginSendCredentials();
             }
         } catch (NetIOException e) {
             logger.error("Could not connect to " + hostname + ":" + port + ": " + e.getMessage());
         }
-        return result;
     }
 
 
-    private State loginSendCredentials() throws NetIOException {
-        State result = State.CONNECTED;
+    private void loginSendCredentials() throws NetIOException {
         try {
             writer.write("clogin " + username + " " + getPassword());
             writer.newLine();
             writer.flush();
             String line = reader.readLine();
-            if (line.startsWith("250")) {
-                result = State.AUTHORIZED;
+            if (!line.startsWith("250")) {
+                throw new IOException(line);
             }
         } catch (NoSuchAlgorithmException e) {
             throw new NetIOException(e);
         } catch (IOException e) {
             throw new NetIOException(e);
         }
-        return result;
     }
 
 
@@ -114,9 +108,8 @@ public class NetworkSwitch {
     }
 
 
-    private State loginConnect() throws NetIOException {
+    private void loginConnect() throws NetIOException {
         logger.debug("connect");
-        State result = State.DISCONNECTED;
         try {
             socket = new Socket(hostname, port);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -125,14 +118,12 @@ public class NetworkSwitch {
             if (line.startsWith("100")) {
                 hash = line.substring(10, 18);
                 logger.debug("Got Hash: " + hash);
-                result = State.CONNECTED;
             }
         } catch (UnknownHostException e) {
             throw new NetIOException(e);
         } catch (IOException e) {
             throw new NetIOException(e);
         }
-        return result;
     }
 
 
@@ -148,38 +139,4 @@ public class NetworkSwitch {
         return sb.toString();
     }
 
-
-    public String getHostname() {
-        return hostname;
-    }
-
-
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
-
-    public int getPort() {
-        return port;
-    }
-
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-
-    public String getUsername() {
-        return username;
-    }
-
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
