@@ -50,7 +50,7 @@ public class NetworkSwitch {
         if (!lights.matches("^[01iu]{4}$"))
             throw new NetIOException("Invalid Format");
         try {
-            if (socket == null || !socket.isConnected()) {
+            if (!(socket != null && socket.isConnected() && socket.isClosed() && socket.isBound())) {
                 login();
             }
             writer.write("port list " + lights);
