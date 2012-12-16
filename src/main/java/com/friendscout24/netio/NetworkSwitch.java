@@ -34,7 +34,7 @@ public class NetworkSwitch {
     @Named("PowerSwitch Password")
     private String         password;
     private Socket         socket;
-    private Logger         logger;
+    private final Logger   logger;
     private BufferedReader reader;
     private BufferedWriter writer;
     private String         hash;
@@ -50,7 +50,7 @@ public class NetworkSwitch {
         if (!lights.matches("^[01iu]{4}$"))
             throw new NetIOException("Invalid Format");
         try {
-            if (!(socket != null && socket.isConnected() && socket.isClosed() && socket.isBound())) {
+            if (!isConnected()) {
                 login();
             }
             writer.write("port list " + lights);
@@ -72,10 +72,15 @@ public class NetworkSwitch {
     }
 
 
+    private boolean isConnected() {
+        return (socket != null && socket.isConnected() && socket.isClosed() && socket.isBound());
+    }
+
+
     private void login() {
         logger.debug("login()");
         try {
-            if (socket == null || !socket.isConnected()) {
+            if (!isConnected()) {
                 loginConnect();
                 loginSendCredentials();
             }
