@@ -73,7 +73,7 @@ public class NetworkSwitch {
 
 
     private boolean isConnected() {
-        return (socket != null && socket.isConnected() && socket.isClosed() && socket.isBound());
+        return (socket != null && socket.isConnected() && socket.isBound() && !socket.isClosed());
     }
 
 
