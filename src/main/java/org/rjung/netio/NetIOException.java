@@ -1,4 +1,4 @@
-package com.friendscout24.netio;
+package org.rjung.netio;
 
 
 public class NetIOException extends Exception {

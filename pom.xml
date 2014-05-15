@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.friendscout24.util</groupId>
   <artifactId>netio</artifactId>
@@ -7,6 +6,12 @@
   <version>1.4-SNAPSHOT</version>
   <name>netio</name>
   <url>http://maven.apache.org</url>
+  <scm>
+    <connection>scm:git:http://github.com/rynr/netio.git</connection>
+    <developerConnection>scm:git:https://github.com/rynr/netio.git</developerConnection>
+    <tag>netio-1.4</tag>
+    <url>http://github.com/rynr/netio</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>com.google.inject</groupId>

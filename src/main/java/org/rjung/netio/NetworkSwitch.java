@@ -1,4 +1,4 @@
-package com.friendscout24.netio;
+package org.rjung.netio;
 
 
 import java.io.BufferedReader;

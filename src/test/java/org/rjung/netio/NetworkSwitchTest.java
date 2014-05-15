@@ -1,10 +1,11 @@
-package com.friendscout24.netio;
+package org.rjung.netio;
 
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rjung.netio.NetworkSwitch;
 
 
 public class NetworkSwitchTest {
