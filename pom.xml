@@ -3,7 +3,7 @@
   <groupId>com.friendscout24.util</groupId>
   <artifactId>netio</artifactId>
   <packaging>jar</packaging>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.5-SNAPSHOT</version>
   <name>netio</name>
   <url>http://maven.apache.org</url>
   <scm>
