@@ -20,6 +20,8 @@ This library gives you a Java-Interface to control them.</description>
 	<properties>
 		<slf4j.version>1.7.7</slf4j.version>
 		<junit.version>4.11</junit.version>
+		<hamcrest.version>1.3</hamcrest.version>
+		<mockito.version>1.9.5</mockito.version>
 		<maven.compuiler.plugin.version>3.1</maven.compuiler.plugin.version>
 		<maven.findbugs.plugin.version>2.5.4</maven.findbugs.plugin.version>
 		<maven.cobertura.plugin.version>2.6</maven.cobertura.plugin.version>
@@ -47,9 +49,6 @@ This library gives you a Java-Interface to control them.</description>
 			<roles>
 				<role>developer</role>
 			</roles>
-			<properties>
-				<picUrl>https://secure.gravatar.com/avatar/88c13904e426e3979ec262f664c34874</picUrl>
-			</properties>
 			<timezone>+1</timezone>
 		</developer>
 	</developers>
@@ -70,6 +69,18 @@ This library gives you a Java-Interface to control them.</description>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>${hamcrest.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

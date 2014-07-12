@@ -27,9 +27,9 @@ public class NetworkSwitch {
 	private String username;
 	private String password;
 
-	private Socket socket;
-	private BufferedReader reader;
-	private BufferedWriter writer;
+	Socket socket;
+	BufferedReader reader;
+	BufferedWriter writer;
 
 	private String hash;
 	State state;
@@ -44,7 +44,7 @@ public class NetworkSwitch {
 
 	public void send(String lights) throws NetIOException {
 		LOG.trace("send(" + lights + ")");
-		if (!lights.matches("^[01iu]{4}$")) {
+		if (lights == null || !lights.matches("^[01iu]{4}$")) {
 			String message = "Invalid send-Format (" + lights + ")";
 			LOG.debug(message);
 			throw new NetIOException(message);
