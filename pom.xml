@@ -23,9 +23,15 @@ This library gives you a Java-Interface to control them.</description>
 		<maven.compuiler.plugin.version>3.1</maven.compuiler.plugin.version>
 	</properties>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
 	<scm>
 		<connection>scm:git:http://github.com/rynr/netio.git</connection>
-		<developerConnection>scm:git:https://github.com/rynr/netio.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:rynr/netio.git</developerConnection>
 		<tag>netio-1.4</tag>
 		<url>http://github.com/rynr/netio</url>
 	</scm>
