@@ -32,8 +32,10 @@ public class NetworkSwitch {
 	private BufferedWriter writer;
 
 	private String hash;
+	State state;
 
 	private NetworkSwitch(Builder builder) {
+		this.state = State.DISCONNECTED;
 		this.hostname = builder.hostname;
 		this.port = builder.port;
 		this.username = builder.username;
@@ -48,8 +50,8 @@ public class NetworkSwitch {
 			throw new NetIOException(message);
 		}
 		try {
-			if (!isConnected()) {
-				login();
+			if (!isAuthorized()) {
+				authorize();
 			}
 			String sendString = "port list " + lights;
 			LOG.debug("> " + sendString);
@@ -75,16 +77,21 @@ public class NetworkSwitch {
 
 	private boolean isConnected() {
 		LOG.trace("isConnected()");
-		return (socket != null && socket.isConnected() && socket.isBound() && !socket
-				.isClosed());
+		return State.CONNECTED.equals(state);
 	}
 
-	private void login() {
-		LOG.trace("login()");
+	private boolean isAuthorized() {
+		LOG.trace("isAuthorized()");
+		return State.AUTHORIZED.equals(state);
+	}
+
+	private void authorize() {
+		LOG.trace("authorize()");
 		try {
 			if (!isConnected()) {
-				loginConnect();
+				connect();
 				loginSendCredentials();
+				state = State.AUTHORIZED;
 			}
 		} catch (NetIOException e) {
 			LOG.error("Could not connect to " + hostname + ":" + port + ": "
@@ -95,7 +102,7 @@ public class NetworkSwitch {
 	private void loginSendCredentials() throws NetIOException {
 		LOG.trace("loginSendCredentials()");
 		try {
-			String sendString = "clogin " + username + " " + getPassword();
+			String sendString = "clogin " + username + " " + getPasswordHash();
 			LOG.debug("> " + sendString);
 			writer.write(sendString);
 			writer.newLine();
@@ -112,16 +119,16 @@ public class NetworkSwitch {
 		}
 	}
 
-	private String getPassword() throws NoSuchAlgorithmException,
+	private String getPasswordHash() throws NoSuchAlgorithmException,
 			UnsupportedEncodingException {
-		LOG.trace("getPassword()");
-		MessageDigest digest = MessageDigest.getInstance("MD5");
-		return DatatypeConverter.printHexBinary(digest.digest((username
-				+ password + hash).getBytes(CHARSET_NAME)));
+		LOG.trace("getPasswordHash()");
+		return DatatypeConverter.printHexBinary(MessageDigest
+				.getInstance("MD5").digest(
+						(username + password + hash).getBytes(CHARSET_NAME)));
 	}
 
-	private void loginConnect() throws NetIOException {
-		LOG.trace("loginConnect()");
+	private void connect() throws NetIOException {
+		LOG.trace("connect()");
 		try {
 			socket = new Socket(hostname, port);
 			reader = new BufferedReader(new InputStreamReader(
@@ -133,12 +140,19 @@ public class NetworkSwitch {
 			if (response != null && response.startsWith("100")) {
 				hash = response.substring(10, 18);
 				LOG.debug("Got Hash: " + hash);
+				state = State.CONNECTED;
 			}
 		} catch (UnknownHostException e) {
+			state = State.DISCONNECTED;
 			throw new NetIOException(e);
 		} catch (IOException e) {
+			state = State.DISCONNECTED;
 			throw new NetIOException(e);
 		}
+	}
+
+	public enum State {
+		DISCONNECTED, CONNECTED, AUTHORIZED
 	}
 
 	public static class Builder {

@@ -1,24 +1,25 @@
 package org.rjung.netio;
 
-
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rjung.netio.NetworkSwitch;
-
+import org.rjung.netio.NetworkSwitch.State;
 
 public class NetworkSwitchTest {
 
-    @Before
-    public void setUp() throws Exception {
-    }
+	private NetworkSwitch networkSwitch;
 
+	@Before
+	public void setUp() throws Exception {
+		networkSwitch = new NetworkSwitch.Builder("hostname", 2345)
+				.setUsername("username").setPassword("password").build();
+	}
 
-    @Test
-    public void testBytesToHexStringDoesSomeCorrectConversions() {
-        assertEquals("6162636465666768696a6b6c6d6e6f707172737475767778797a",
-                NetworkSwitch.bytesToHexString("abcdefghijklmnopqrstuvwxyz".getBytes()));
-    }
+	@Test
+	public void newNetworkSwitchIsDisconnected() {
+		assertThat(networkSwitch.state, equalTo(State.DISCONNECTED));
+	}
 
 }
