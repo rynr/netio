@@ -99,7 +99,7 @@ public class NetworkSwitch {
 			writer.flush();
 			String response = reader.readLine();
 			LOG.debug("< " + response);
-			if (!response.startsWith("250")) {
+			if (response == null || !response.startsWith("250")) {
 				throw new IOException(response);
 			}
 		} catch (NoSuchAlgorithmException e) {
@@ -127,7 +127,7 @@ public class NetworkSwitch {
 					socket.getOutputStream(), CHARSET_NAME));
 			String response = reader.readLine();
 			LOG.debug("< " + response);
-			if (response.startsWith("100")) {
+			if (response != null && response.startsWith("100")) {
 				hash = response.substring(10, 18);
 				LOG.debug("Got Hash: " + hash);
 			}
