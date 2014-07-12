@@ -71,7 +71,7 @@ public class NetworkSwitch {
 						"Error closing Socket on Exception (" + e.getMessage(),
 						e1);
 			}
-			throw new NetIOException(e);
+			throw new NetIOException("Could not send command", e);
 		}
 	}
 
@@ -144,10 +144,10 @@ public class NetworkSwitch {
 			}
 		} catch (UnknownHostException e) {
 			state = State.DISCONNECTED;
-			throw new NetIOException(e);
+			throw new NetIOException("Cannot connect", e);
 		} catch (IOException e) {
 			state = State.DISCONNECTED;
-			throw new NetIOException(e);
+			throw new NetIOException("Cannot connect", e);
 		}
 	}
 
