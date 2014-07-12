@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class NetworkSwitch {
 
+	private static final String CHARSET_NAME = "US-ASCII";
 	private static final Logger LOG = LoggerFactory
 			.getLogger(NetworkSwitch.class);
 
@@ -107,11 +109,12 @@ public class NetworkSwitch {
 		}
 	}
 
-	private String getPassword() throws NoSuchAlgorithmException {
+	private String getPassword() throws NoSuchAlgorithmException,
+			UnsupportedEncodingException {
 		LOG.trace("getPassword()");
 		MessageDigest digest = MessageDigest.getInstance("MD5");
 		return bytesToHexString(digest.digest((username + password + hash)
-				.getBytes()));
+				.getBytes(CHARSET_NAME)));
 	}
 
 	private void loginConnect() throws NetIOException {
@@ -119,9 +122,9 @@ public class NetworkSwitch {
 		try {
 			socket = new Socket(hostname, port);
 			reader = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
+					socket.getInputStream(), CHARSET_NAME));
 			writer = new BufferedWriter(new OutputStreamWriter(
-					socket.getOutputStream()));
+					socket.getOutputStream(), CHARSET_NAME));
 			String response = reader.readLine();
 			LOG.debug("< " + response.toString());
 			if (response.startsWith("100")) {
