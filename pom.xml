@@ -22,6 +22,7 @@ This library gives you a Java-Interface to control them.</description>
 		<junit.version>4.11</junit.version>
 		<maven.compuiler.plugin.version>3.1</maven.compuiler.plugin.version>
 		<maven.findbugs.plugin.version>2.5.4</maven.findbugs.plugin.version>
+		<maven.cobertura.plugin.version>2.6</maven.cobertura.plugin.version>
 	</properties>
 
 	<parent>
@@ -98,6 +99,11 @@ This library gives you a Java-Interface to control them.</description>
 					<threshold>Low</threshold>
 					<xmlOutput>true</xmlOutput>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${maven.cobertura.plugin.version}</version>
 			</plugin>
 		</plugins>
 	</reporting>

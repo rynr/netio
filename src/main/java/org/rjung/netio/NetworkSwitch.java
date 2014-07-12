@@ -25,9 +25,11 @@ public class NetworkSwitch {
 	private Integer port;
 	private String username;
 	private String password;
+
 	private Socket socket;
 	private BufferedReader reader;
 	private BufferedWriter writer;
+
 	private String hash;
 
 	private NetworkSwitch(Builder builder) {
