@@ -37,8 +37,13 @@ public class NetworkSwitchTest {
 	}
 
 	@Test(expected = NetIOException.class)
-	public void invalidSendStringRaisesException() throws NetIOException {
+	public void sendNullStringRaisesException() throws NetIOException {
 		networkSwitch.send(null);
+	}
+
+	@Test(expected = NetIOException.class)
+	public void sendInvalidStringRaisesException() throws NetIOException {
+		networkSwitch.send("invalid");
 	}
 
 	@Test
