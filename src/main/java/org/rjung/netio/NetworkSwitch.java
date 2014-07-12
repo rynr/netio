@@ -36,20 +36,26 @@ public class NetworkSwitch {
 	}
 
 	public void send(String lights) throws NetIOException {
-		if (!lights.matches("^[01iu]{4}$"))
-			throw new NetIOException("Invalid Format");
+		LOG.trace("send(" + lights + ")");
+		if (!lights.matches("^[01iu]{4}$")) {
+			String message = "Invalid send-Format (" + lights + ")";
+			LOG.debug(message);
+			throw new NetIOException(message);
+		}
 		try {
 			if (!isConnected()) {
 				login();
 			}
-			writer.write("port list " + lights);
+			String sendString = "port list " + lights;
+			LOG.debug("> " + sendString);
+			writer.write(sendString);
 			writer.newLine();
 			writer.flush();
 			StringBuffer response = new StringBuffer();
 			while (reader.ready()) {
 				response.append(reader.read());
 			}
-			LOG.debug(response.toString());
+			LOG.debug("< " + response.toString());
 		} catch (IOException e) {
 			try {
 				socket.close();
@@ -63,12 +69,13 @@ public class NetworkSwitch {
 	}
 
 	private boolean isConnected() {
+		LOG.trace("isConnected()");
 		return (socket != null && socket.isConnected() && socket.isBound() && !socket
 				.isClosed());
 	}
 
 	private void login() {
-		LOG.debug("login()");
+		LOG.trace("login()");
 		try {
 			if (!isConnected()) {
 				loginConnect();
@@ -81,13 +88,17 @@ public class NetworkSwitch {
 	}
 
 	private void loginSendCredentials() throws NetIOException {
+		LOG.trace("loginSendCredentials()");
 		try {
-			writer.write("clogin " + username + " " + getPassword());
+			String sendString = "clogin " + username + " " + getPassword();
+			LOG.debug("> " + sendString);
+			writer.write(sendString);
 			writer.newLine();
 			writer.flush();
-			String line = reader.readLine();
-			if (!line.startsWith("250")) {
-				throw new IOException(line);
+			String response = reader.readLine();
+			LOG.debug("< " + response.toString());
+			if (!response.startsWith("250")) {
+				throw new IOException(response);
 			}
 		} catch (NoSuchAlgorithmException e) {
 			throw new NetIOException(e);
@@ -97,22 +108,24 @@ public class NetworkSwitch {
 	}
 
 	private String getPassword() throws NoSuchAlgorithmException {
+		LOG.trace("getPassword()");
 		MessageDigest digest = MessageDigest.getInstance("MD5");
 		return bytesToHexString(digest.digest((username + password + hash)
 				.getBytes()));
 	}
 
 	private void loginConnect() throws NetIOException {
-		LOG.debug("connect");
+		LOG.trace("loginConnect()");
 		try {
 			socket = new Socket(hostname, port);
 			reader = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
 			writer = new BufferedWriter(new OutputStreamWriter(
 					socket.getOutputStream()));
-			String line = reader.readLine();
-			if (line.startsWith("100")) {
-				hash = line.substring(10, 18);
+			String response = reader.readLine();
+			LOG.debug("< " + response.toString());
+			if (response.startsWith("100")) {
+				hash = response.substring(10, 18);
 				LOG.debug("Got Hash: " + hash);
 			}
 		} catch (UnknownHostException e) {
