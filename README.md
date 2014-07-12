@@ -6,6 +6,16 @@ NETIO is a series of smart sockets nd PDU (Power Distribution Unit) by
 
 This library gives you a Java-Interface to control them.
 
+Example
+-------
+
+    NetworkSwitch networkSwitch = new NetworkSwitch.Builder(
+            "switch.host.name", 2345).setUsername("admin")
+            .setPassword("secret").build();
+    // Switch all 4 units off
+    // 1 on, 0 off, i reset, u no-change
+    networkSwitch.send("0000");
+
 Info
 ----
 
