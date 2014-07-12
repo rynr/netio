@@ -21,6 +21,7 @@ This library gives you a Java-Interface to control them.</description>
 		<slf4j.version>1.7.7</slf4j.version>
 		<junit.version>4.11</junit.version>
 		<maven.compuiler.plugin.version>3.1</maven.compuiler.plugin.version>
+		<maven.findbugs.plugin.version>2.5.4</maven.findbugs.plugin.version>
 	</properties>
 
 	<parent>
@@ -85,4 +86,19 @@ This library gives you a Java-Interface to control them.</description>
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>${maven.findbugs.plugin.version}</version>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
