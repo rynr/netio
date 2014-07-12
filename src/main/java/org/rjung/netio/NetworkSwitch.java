@@ -98,7 +98,7 @@ public class NetworkSwitch {
 			writer.newLine();
 			writer.flush();
 			String response = reader.readLine();
-			LOG.debug("< " + response.toString());
+			LOG.debug("< " + response);
 			if (!response.startsWith("250")) {
 				throw new IOException(response);
 			}
@@ -126,7 +126,7 @@ public class NetworkSwitch {
 			writer = new BufferedWriter(new OutputStreamWriter(
 					socket.getOutputStream(), CHARSET_NAME));
 			String response = reader.readLine();
-			LOG.debug("< " + response.toString());
+			LOG.debug("< " + response);
 			if (response.startsWith("100")) {
 				hash = response.substring(10, 18);
 				LOG.debug("Got Hash: " + hash);
