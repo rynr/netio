@@ -16,18 +16,23 @@ import org.slf4j.LoggerFactory;
 
 public class NetworkSwitch {
 
+	private static final Logger LOG = LoggerFactory
+			.getLogger(NetworkSwitch.class);
+
 	private String hostname;
 	private Integer port;
 	private String username;
 	private String password;
 	private Socket socket;
-	private final Logger logger;
 	private BufferedReader reader;
 	private BufferedWriter writer;
 	private String hash;
 
-	public NetworkSwitch() {
-		logger = LoggerFactory.getLogger(NetworkSwitch.class);
+	private NetworkSwitch(Builder builder) {
+		this.hostname = builder.hostname;
+		this.port = builder.port;
+		this.username = builder.username;
+		this.password = builder.password;
 	}
 
 	public void send(String lights) throws NetIOException {
@@ -44,12 +49,12 @@ public class NetworkSwitch {
 			while (reader.ready()) {
 				response.append(reader.read());
 			}
-			logger.debug(response.toString());
+			LOG.debug(response.toString());
 		} catch (IOException e) {
 			try {
 				socket.close();
 			} catch (IOException e1) {
-				logger.error(
+				LOG.error(
 						"Error closing Socket on Exception (" + e.getMessage(),
 						e1);
 			}
@@ -63,14 +68,14 @@ public class NetworkSwitch {
 	}
 
 	private void login() {
-		logger.debug("login()");
+		LOG.debug("login()");
 		try {
 			if (!isConnected()) {
 				loginConnect();
 				loginSendCredentials();
 			}
 		} catch (NetIOException e) {
-			logger.error("Could not connect to " + hostname + ":" + port + ": "
+			LOG.error("Could not connect to " + hostname + ":" + port + ": "
 					+ e.getMessage());
 		}
 	}
@@ -98,7 +103,7 @@ public class NetworkSwitch {
 	}
 
 	private void loginConnect() throws NetIOException {
-		logger.debug("connect");
+		LOG.debug("connect");
 		try {
 			socket = new Socket(hostname, port);
 			reader = new BufferedReader(new InputStreamReader(
@@ -108,7 +113,7 @@ public class NetworkSwitch {
 			String line = reader.readLine();
 			if (line.startsWith("100")) {
 				hash = line.substring(10, 18);
-				logger.debug("Got Hash: " + hash);
+				LOG.debug("Got Hash: " + hash);
 			}
 		} catch (UnknownHostException e) {
 			throw new NetIOException(e);
@@ -129,4 +134,29 @@ public class NetworkSwitch {
 		return sb.toString();
 	}
 
+	public static class Builder {
+		private String hostname;
+		private Integer port;
+		private String username;
+		private String password;
+
+		public Builder(String hostname, Integer port) {
+			this.hostname = hostname;
+			this.port = port;
+		}
+
+		public Builder setUsername(String username) {
+			this.username = username;
+			return this;
+		}
+
+		public Builder setPassword(String password) {
+			this.password = password;
+			return this;
+		}
+
+		public NetworkSwitch build() {
+			return new NetworkSwitch(this);
+		}
+	}
 }
