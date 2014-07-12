@@ -10,7 +10,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Formatter;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,8 +116,8 @@ public class NetworkSwitch {
 			UnsupportedEncodingException {
 		LOG.trace("getPassword()");
 		MessageDigest digest = MessageDigest.getInstance("MD5");
-		return bytesToHexString(digest.digest((username + password + hash)
-				.getBytes(CHARSET_NAME)));
+		return DatatypeConverter.printHexBinary(digest.digest((username
+				+ password + hash).getBytes(CHARSET_NAME)));
 	}
 
 	private void loginConnect() throws NetIOException {
@@ -138,18 +139,6 @@ public class NetworkSwitch {
 		} catch (IOException e) {
 			throw new NetIOException(e);
 		}
-	}
-
-	public static String bytesToHexString(byte[] bytes) {
-		StringBuilder sb = new StringBuilder(bytes.length * 2);
-
-		Formatter formatter = new Formatter(sb);
-		for (byte b : bytes) {
-			formatter.format("%02x", b);
-		}
-		formatter.close();
-
-		return sb.toString();
 	}
 
 	public static class Builder {
