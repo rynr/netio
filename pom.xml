@@ -29,6 +29,23 @@ This library gives you a Java-Interface to control them.</description>
 		<tag>netio-1.4</tag>
 		<url>http://github.com/rynr/netio</url>
 	</scm>
+
+	<developers>
+		<developer>
+			<id>rynr</id>
+			<name>Rainer Jung</name>
+			<email>Rainer.Jung@gmail.com</email>
+			<url>http://about.me/rjung</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<properties>
+				<picUrl>https://secure.gravatar.com/avatar/88c13904e426e3979ec262f664c34874</picUrl>
+			</properties>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -48,6 +65,7 @@ This library gives you a Java-Interface to control them.</description>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
