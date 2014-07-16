@@ -4,7 +4,7 @@
 	<groupId>org.rjung.util</groupId>
 	<artifactId>netio</artifactId>
 	<packaging>jar</packaging>
-	<version>1.5-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<name>netio</name>
 	<url>http://github.com/rynr/netio</url>
 	<description>NETIO is a series of smart sockets nd PDU (Power Distribution Unit) by Koukaam.
