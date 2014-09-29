@@ -95,7 +95,7 @@ public class NetworkSwitch {
 			}
 		} catch (NetIOException e) {
 			LOG.error("Could not connect to " + hostname + ":" + port + ": "
-					+ e.getMessage());
+					+ e.getMessage(), e);
 		}
 	}
 
