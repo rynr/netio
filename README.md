@@ -23,5 +23,4 @@ Info
  - [Github](https://github.com/rynr/netio)
  - [Bugs](https://github.com/rynr/netio/issues)
  - [![Build Status](https://travis-ci.org/rynr/netio.svg?branch=master)](https://travis-ci.org/rynr/netio)
- - [![Code Climate](https://codeclimate.com/github/rynr/netio.png)](https://codeclimate.com/github/rynr/netio)
 
