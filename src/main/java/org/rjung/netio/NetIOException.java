@@ -1,6 +1,8 @@
 package org.rjung.netio;
 
 public class NetIOException extends Exception {
+    
+    private static final long serialVersionUID = -1948688832753938552L;
 
     public NetIOException(String message) {
         super(message);
@@ -13,6 +15,4 @@ public class NetIOException extends Exception {
     public NetIOException(String message, Throwable e) {
         super(message, e);
     }
-
-    private static final long serialVersionUID = -1948688832753938552L;
 }
