@@ -58,7 +58,7 @@ public class NetworkSwitch {
 			writer.write(sendString);
 			writer.newLine();
 			writer.flush();
-			StringBuffer response = new StringBuffer();
+			StringBuilder response = new StringBuilder();
 			while (reader.ready()) {
 				response.append(reader.read());
 			}
