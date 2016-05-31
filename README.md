@@ -22,5 +22,6 @@ Info
  - [Info](https://rynr.github.io/netio/)
  - [Github](https://github.com/rynr/netio)
  - [Bugs](https://github.com/rynr/netio/issues)
+ - [Chat/Questions](https://gitter.im/rynr/netio)
  - [![Build Status](https://travis-ci.org/rynr/netio.svg?branch=master)](https://travis-ci.org/rynr/netio)
 
