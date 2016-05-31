@@ -4,9 +4,9 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <title>Netio by rynr</title>
   </head>
@@ -29,7 +29,7 @@
     <div class="container">
       <section id="main_content">
         <h1>
-<a name="netio" class="anchor" href="#netio"><span class="octicon octicon-link"></span></a>netio</h1>
+<a id="netio" class="anchor" href="#netio" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>netio</h1>
 
 <p>NETIO is a series of smart sockets nd PDU (Power Distribution Unit) by
 <a href="http://www.koukaam.se/kkm/index.php">Koukaam</a>.</p>
@@ -37,21 +37,21 @@
 <p>This library gives you a Java-Interface to control them.</p>
 
 <h2>
-<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example</h2>
 
-<div class="highlight highlight-java"><pre><span class="n">NetworkSwitch</span> <span class="n">networkSwitch</span> <span class="o">=</span> <span class="k">new</span> <span class="n">NetworkSwitch</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="s">"switch.host.name"</span><span class="o">,</span> <span class="mi">2345</span><span class="o">)</span>
-        <span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"admin"</span><span class="o">).</span><span class="na">setPassword</span><span class="o">(</span><span class="s">"secret"</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
-<span class="c1">// Switch all 4 units off (1 on, 0 off, i reset, u no-change)</span>
-<span class="n">networkSwitch</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="s">"0000"</span><span class="o">);</span>
-</pre></div>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">NetworkSwitch</span> networkSwitch <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">NetworkSwitch</span>.<span class="pl-smi">Builder</span>(<span class="pl-s"><span class="pl-pds">"</span>switch.host.name<span class="pl-pds">"</span></span>, <span class="pl-c1">2345</span>)
+        .setUsername(<span class="pl-s"><span class="pl-pds">"</span>admin<span class="pl-pds">"</span></span>)<span class="pl-k">.</span>setPassword(<span class="pl-s"><span class="pl-pds">"</span>secret<span class="pl-pds">"</span></span>)<span class="pl-k">.</span>build();
+<span class="pl-c">// Switch all 4 units off (1 on, 0 off, i reset, u no-change)</span>
+networkSwitch<span class="pl-k">.</span>send(<span class="pl-s"><span class="pl-pds">"</span>0000<span class="pl-pds">"</span></span>);</pre></div>
 
 <h2>
-<a name="info" class="anchor" href="#info"><span class="octicon octicon-link"></span></a>Info</h2>
+<a id="info" class="anchor" href="#info" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Info</h2>
 
 <ul>
 <li><a href="https://rynr.github.io/netio/">Info</a></li>
 <li><a href="https://github.com/rynr/netio">Github</a></li>
 <li><a href="https://github.com/rynr/netio/issues">Bugs</a></li>
+<li><a href="https://gitter.im/rynr/netio">Chat/Questions</a></li>
 <li><a href="https://travis-ci.org/rynr/netio"><img src="https://travis-ci.org/rynr/netio.svg?branch=master" alt="Build Status"></a></li>
 </ul>
       </section>
