@@ -1,6 +1,8 @@
 netio
 =====
 
+[![Join the chat at https://gitter.im/rynr/netio](https://badges.gitter.im/rynr/netio.svg)](https://gitter.im/rynr/netio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 NETIO is a series of smart sockets nd PDU (Power Distribution Unit) by
 [Koukaam](http://www.koukaam.se/kkm/index.php).
 
