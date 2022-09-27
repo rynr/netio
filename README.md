@@ -28,8 +28,9 @@ Example
 ```java
 NetworkSwitch networkSwitch = NetworkSwitch.builder("switch.host.name", 2345)
         .username("admin").password("secret").build();
-// Switch all 4 units off (1 on, 0 off, i reset, u no-change)
-networkSwitch.set(1, Switch.ON);
+networkSwitch.set(1, Switch.ON);        // Switch unit 1 on
+networkSwitch.set(2, Switch.OFF);       // Switch unit 2 off
+networkSwitch.set(3, Switch.INTERRUPT); // Send interrupt to unit 3
 ```
 
 Info
