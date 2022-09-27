@@ -26,10 +26,10 @@ Example
 -------
 
 ```java
-NetworkSwitch networkSwitch = new NetworkSwitch.Builder("switch.host.name", 2345)
-        .setUsername("admin").setPassword("secret").build();
+NetworkSwitch networkSwitch = NetworkSwitch.builder("switch.host.name", 2345)
+        .username("admin").password("secret").build();
 // Switch all 4 units off (1 on, 0 off, i reset, u no-change)
-networkSwitch.send("0000");
+networkSwitch.set(1, Switch.ON);
 ```
 
 Info
