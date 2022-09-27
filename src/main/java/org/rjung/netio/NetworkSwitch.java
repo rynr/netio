@@ -113,13 +113,13 @@ public class NetworkSwitch {
         }
     }
 
-    public void set(int light, int state) throws NoSuchAlgorithmException, URISyntaxException,
+    public void set(int light, Switch state) throws NoSuchAlgorithmException, URISyntaxException,
             IOException, InterruptedException {
         if (!isAuthenticated()) {
             authorize();
         }
         String[] elements = call(new URL(baseUrl,
-                MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=port+{1}+{2}", this.session, light, state)))
+                MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=port+{1}+{2}", this.session, light, state.getCommand())))
                 .split(" ");
         if ("250".equals(elements[0])) {
             LOG.debug("OK");
@@ -143,6 +143,23 @@ public class NetworkSwitch {
 
     public enum State {
         DISCONNECTED, CONNECTED, AUTHENTICATED
+    }
+
+    public enum Switch {
+        OFF("0"),
+        ON("1"),
+        MANUAL("manual"),
+        INTERRUPT("int");
+
+        private String command;
+
+        Switch(String command) {
+            this.command = command;
+        }
+
+        public String getCommand() {
+            return command;
+        }
     }
 
     /**
