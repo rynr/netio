@@ -31,5 +31,5 @@ Info
  - [Github](https://github.com/rynr/netio)
  - [Bugs](https://github.com/rynr/netio/issues)
  - [![Join the chat at https://gitter.im/rynr/netio](https://badges.gitter.im/rynr/netio.svg)](https://gitter.im/rynr/netio)
- - [![Build Status](https://travis-ci.org/rynr/netio.svg?branch=master)](https://travis-ci.org/rynr/netio)
+ - [![Build Status](https://github.com/rynr/netio/actions/workflows/maven.yml/badge.svg?branch=master)](https://travis-ci.org/rynr/netio)
 
