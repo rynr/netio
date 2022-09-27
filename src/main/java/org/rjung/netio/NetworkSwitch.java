@@ -1,78 +1,39 @@
 package org.rjung.netio;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import javax.xml.bind.DatatypeConverter;
+import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetworkSwitch {
 
-    private static final String CHARSET_NAME = "US-ASCII";
-    private static final Logger LOG = LoggerFactory
-            .getLogger(NetworkSwitch.class);
+    private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes();
+    private static final Logger LOG = LoggerFactory.getLogger(NetworkSwitch.class);
 
-    private String hostname;
-    private Integer port;
-    private String username;
-    private String password;
-
-    Socket socket;
-    BufferedReader reader;
-    BufferedWriter writer;
+    private final String username;
+    private final String password;
+    private final HttpClient client;
+    private final URL baseUrl;
 
     private String hash;
-    State state;
+    private String session;
+    private State state;
 
-    private NetworkSwitch(Builder builder) {
+    private NetworkSwitch(Builder builder) throws IOException {
         this.state = State.DISCONNECTED;
-        this.hostname = builder.hostname;
-        this.port = builder.port;
         this.username = builder.username;
         this.password = builder.password;
-    }
-
-    public void send(String lights) throws NetIOException {
-        LOG.trace("send(" + lights + ")");
-        if (lights == null || !lights.matches("^[01iu]{4}$")) {
-            String message = "Invalid send-Format (" + lights + ")";
-            LOG.debug(message);
-            throw new NetIOException(message);
-        }
-        try {
-            if (!isAuthorized()) {
-                authorize();
-            }
-            String sendString = "port list " + lights;
-            LOG.debug("> " + sendString);
-            writer.write(sendString);
-            writer.newLine();
-            writer.flush();
-            StringBuilder response = new StringBuilder();
-            while (reader.ready()) {
-                response.append(reader.read());
-            }
-            LOG.debug("< " + response.toString());
-        } catch (IOException e) {
-            try {
-                socket.close();
-            } catch (IOException e1) {
-                LOG.error(
-                        "Error closing Socket on Exception (" + e.getMessage(),
-                        e1);
-            }
-            throw new NetIOException("Could not send command", e);
-        }
+        this.client = HttpClient.newHttpClient();
+        baseUrl = new URL("http", builder.hostname, builder.port, "/");
     }
 
     private boolean isConnected() {
@@ -85,70 +46,65 @@ public class NetworkSwitch {
         return State.AUTHORIZED.equals(state);
     }
 
-    private void authorize() {
-        LOG.trace("authorize()");
-        try {
-            if (!isConnected()) {
-                connect();
-                loginSendCredentials();
-                state = State.AUTHORIZED;
+    public void connect() throws URISyntaxException, IOException, InterruptedException {
+        String[] elements = call(
+                new URL(baseUrl, MessageFormat.format("/cgi/kshell.cgi?session=init+{0}", System.currentTimeMillis())))
+                        .split(" ");
+        if ("250".equals(elements[0])) {
+            for (int i = 1; i < elements.length; i++) {
+                String[] parts = elements[i].split("=");
+                if ("hash".equals(parts[0])) {
+                    this.hash = parts[1];
+                } else if ("ssid".equals(parts[0])) {
+                    this.session = parts[1];
+                } else {
+                    LOG.warn("Unknown property {}={}", parts[0], parts[1]);
+                }
             }
-        } catch (NetIOException e) {
-            LOG.error("Could not connect to " + hostname + ":" + port + ": "
-                    + e.getMessage(), e);
+            this.state = State.CONNECTED;
         }
     }
 
-    private void loginSendCredentials() throws NetIOException {
-        LOG.trace("loginSendCredentials()");
-        try {
-            String sendString = "clogin " + username + " " + getPasswordHash();
-            LOG.debug("> " + sendString);
-            writer.write(sendString);
-            writer.newLine();
-            writer.flush();
-            String response = reader.readLine();
-            LOG.debug("< " + response);
-            if (response == null || !response.startsWith("250")) {
-                throw new IOException(response);
-            }
-        } catch (NoSuchAlgorithmException e) {
-            throw new NetIOException(e);
-        } catch (IOException e) {
-            throw new NetIOException(e);
+    public void authorize() throws URISyntaxException, IOException, InterruptedException,
+            NoSuchAlgorithmException {
+        if (!isConnected()) {
+            connect();
+        }
+        String[] elements = call(new URL(baseUrl,
+                MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=clogin+{1}+{2}", session, username, bytesToHex(
+                        MessageDigest.getInstance("MD5").digest((username + password + hash).getBytes(StandardCharsets.US_ASCII))))))
+                                .split(" ");
+        if ("250".equals(elements[0])) {
+            this.state = State.AUTHORIZED;
         }
     }
 
-    private String getPasswordHash() throws NoSuchAlgorithmException,
-            UnsupportedEncodingException {
-        LOG.trace("getPasswordHash()");
-        return DatatypeConverter.printHexBinary(MessageDigest
-                .getInstance("MD5").digest(
-                        (username + password + hash).getBytes(CHARSET_NAME)));
+    public void set(int light, int state) throws NoSuchAlgorithmException, URISyntaxException,
+            IOException, InterruptedException {
+        if (!isAuthorized()) {
+            authorize();
+        }
+        String[] elements = call(new URL(baseUrl,
+                MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=port+{1}+{2}", this.session, light, state)))
+                        .split(" ");
+        if ("250".equals(elements[0])) {
+            LOG.debug("OK");
+        }
     }
 
-    private void connect() throws NetIOException {
-        LOG.trace("connect()");
-        try {
-            socket = new Socket(hostname, port);
-            reader = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream(), CHARSET_NAME));
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    socket.getOutputStream(), CHARSET_NAME));
-            String response = reader.readLine();
-            LOG.debug("< " + response);
-            if (response != null && response.startsWith("100")) {
-                hash = response.substring(10, 18);
-                LOG.debug("Got Hash: " + hash);
-                state = State.CONNECTED;
-            }
-        } catch (UnknownHostException e) {
-            state = State.DISCONNECTED;
-            throw new NetIOException("Cannot connect", e);
-        } catch (IOException e) {
-            state = State.DISCONNECTED;
-            throw new NetIOException("Cannot connect", e);
+    private String call(URL url) throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(url.toURI()).GET().build();
+        return client.send(httpRequest, BodyHandlers.ofString()).body();
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        byte[] hexChars = new byte[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
+        return new String(hexChars, StandardCharsets.UTF_8);
     }
 
     public enum State {
@@ -156,8 +112,8 @@ public class NetworkSwitch {
     }
 
     public static class Builder {
-        private String hostname;
-        private Integer port;
+        private final String hostname;
+        private final Integer port;
         private String username;
         private String password;
 
@@ -176,7 +132,7 @@ public class NetworkSwitch {
             return this;
         }
 
-        public NetworkSwitch build() {
+        public NetworkSwitch build() throws IOException {
             return new NetworkSwitch(this);
         }
     }

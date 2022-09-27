@@ -1,15 +1,19 @@
 package org.rjung.netio;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.rjung.netio.NetworkSwitch.State;
@@ -22,7 +26,7 @@ public class NetworkSwitchTest {
     @Mock
     private BufferedReader reader;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         networkSwitch = new NetworkSwitch.Builder("hostname", 2345)
@@ -32,22 +36,26 @@ public class NetworkSwitchTest {
     }
 
     @Test
-    public void newNetworkSwitchIsDisconnected() {
+    void newNetworkSwitchIsDisconnected() {
         assertThat(networkSwitch.state, equalTo(State.DISCONNECTED));
     }
 
-    @Test(expected = NetIOException.class)
-    public void sendNullStringRaisesException() throws NetIOException {
-        networkSwitch.send(null);
-    }
-
-    @Test(expected = NetIOException.class)
-    public void sendInvalidStringRaisesException() throws NetIOException {
-        networkSwitch.send("invalid");
+    @Test
+    void sendNullStringRaisesException() throws NetIOException {
+        var exception = Assertions.assertThrows(NetIOException.class,
+                () -> networkSwitch.send(null) );
+        assertThat(exception.getMessage(), is("TBD"));
     }
 
     @Test
-    public void validSendStringWritesToConnection() throws NetIOException,
+    void sendInvalidStringRaisesException() throws NetIOException {
+        var exception = Assertions.assertThrows(NetIOException.class,
+                () -> networkSwitch.send("invalid") );
+        assertThat(exception.getMessage(), is("TBD"));
+    }
+
+    @Test
+    void validSendStringWritesToConnection() throws NetIOException,
             IOException {
         networkSwitch.state = State.AUTHORIZED;
         networkSwitch.send("01iu");
