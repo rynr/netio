@@ -14,10 +14,13 @@ import java.text.MessageFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.requireNonNull;
+
 public class NetworkSwitch {
 
     private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes();
     private static final Logger LOG = LoggerFactory.getLogger(NetworkSwitch.class);
+    public static final int DEFAULT_PORT = 80;
 
     private final String username;
     private final String password;
@@ -33,23 +36,54 @@ public class NetworkSwitch {
         this.username = builder.username;
         this.password = builder.password;
         this.client = HttpClient.newHttpClient();
-        baseUrl = new URL("http", builder.hostname, builder.port, "/");
+        this.baseUrl = new URL("http", builder.hostname, builder.port, "/");
     }
 
-    private boolean isConnected() {
+    /**
+     * Retrieve a {@link Builder} for a new {@link NetworkSwitch} using the default port.
+     *
+     * @param hostname The hostname of the switch to control.
+     * @return A {@link Builder} with the given <tt>hostname</tt> and the default <tt>port</tt>
+     */
+    public static Builder builder(String hostname) {
+        return builder(hostname, DEFAULT_PORT);
+    }
+
+    /**
+     * Retrieve a {@link Builder} for a new {@link NetworkSwitch}.
+     *
+     * @param hostname The hostname of the switch to control.
+     * @param port     The port of the switch to control.
+     * @return A {@link Builder} with the given <tt>hostname</tt> and <tt>port</tt>
+     */
+    public static Builder builder(String hostname, int port) {
+        return new Builder(hostname, port);
+    }
+
+    /**
+     * Verify, if the {@link NetworkSwitch} is yet connected.
+     *
+     * @return <tt>false</tt>, if no connection was started
+     */
+    public boolean isConnected() {
         LOG.trace("isConnected()");
         return State.CONNECTED.equals(state);
     }
 
-    private boolean isAuthorized() {
+    /**
+     * Verify, if the {@link NetworkSwitch} is yet authenticated.
+     *
+     * @return <tt>false</tt>, if no connection was authenticated
+     */
+    public boolean isAuthenticated() {
         LOG.trace("isAuthorized()");
-        return State.AUTHORIZED.equals(state);
+        return State.AUTHENTICATED.equals(state);
     }
 
     public void connect() throws URISyntaxException, IOException, InterruptedException {
         String[] elements = call(
                 new URL(baseUrl, MessageFormat.format("/cgi/kshell.cgi?session=init+{0}", System.currentTimeMillis())))
-                        .split(" ");
+                .split(" ");
         if ("250".equals(elements[0])) {
             for (int i = 1; i < elements.length; i++) {
                 String[] parts = elements[i].split("=");
@@ -73,20 +107,20 @@ public class NetworkSwitch {
         String[] elements = call(new URL(baseUrl,
                 MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=clogin+{1}+{2}", session, username, bytesToHex(
                         MessageDigest.getInstance("MD5").digest((username + password + hash).getBytes(StandardCharsets.US_ASCII))))))
-                                .split(" ");
+                .split(" ");
         if ("250".equals(elements[0])) {
-            this.state = State.AUTHORIZED;
+            this.state = State.AUTHENTICATED;
         }
     }
 
     public void set(int light, int state) throws NoSuchAlgorithmException, URISyntaxException,
             IOException, InterruptedException {
-        if (!isAuthorized()) {
+        if (!isAuthenticated()) {
             authorize();
         }
         String[] elements = call(new URL(baseUrl,
                 MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=port+{1}+{2}", this.session, light, state)))
-                        .split(" ");
+                .split(" ");
         if ("250".equals(elements[0])) {
             LOG.debug("OK");
         }
@@ -97,7 +131,7 @@ public class NetworkSwitch {
         return client.send(httpRequest, BodyHandlers.ofString()).body();
     }
 
-    public static String bytesToHex(byte[] bytes) {
+    private static String bytesToHex(byte[] bytes) {
         byte[] hexChars = new byte[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
@@ -108,26 +142,47 @@ public class NetworkSwitch {
     }
 
     public enum State {
-        DISCONNECTED, CONNECTED, AUTHORIZED
+        DISCONNECTED, CONNECTED, AUTHENTICATED
+    }
+
+    /**
+     * Informal retrieval (also for testing) of the base URL.
+     *
+     * @return The base {@link URL} of the {@link NetworkSwitch}
+     */
+    public URL getBaseUrl() {
+        // A {@link URL} is immutable (outside of it's package), so sharing is fine.
+        return baseUrl;
+    }
+
+    /**
+     * Informal retrieval of the current {@link State} of the {@link NetworkSwitch}.
+     *
+     * @return The currenr {@link State} of the {@link NetworkSwitch}
+     */
+    public State getState() {
+        return state;
     }
 
     public static class Builder {
         private final String hostname;
-        private final Integer port;
+        private final int port;
         private String username;
         private String password;
 
-        public Builder(String hostname, Integer port) {
+        public Builder(String hostname, int port) {
+            requireNonNull(hostname);
+
             this.hostname = hostname;
             this.port = port;
         }
 
-        public Builder setUsername(String username) {
+        public Builder username(String username) {
             this.username = username;
             return this;
         }
 
-        public Builder setPassword(String password) {
+        public Builder password(String password) {
             this.password = password;
             return this;
         }
