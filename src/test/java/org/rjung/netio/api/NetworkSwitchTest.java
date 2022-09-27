@@ -1,4 +1,4 @@
-package org.rjung.netio;
+package org.rjung.netio.api;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.rjung.netio.api.NetworkSwitch;
 
 @ExtendWith(MockitoExtension.class)
 public class NetworkSwitchTest {

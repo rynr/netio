@@ -1,4 +1,4 @@
-package org.rjung.netio;
+package org.rjung.netio.api;
 
 public class NetIOException extends Exception {
     

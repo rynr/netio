@@ -1,4 +1,4 @@
-package org.rjung.netio;
+package org.rjung.netio.api;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 
+import org.rjung.netio.api.enums.Switch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,23 +144,6 @@ public class NetworkSwitch {
 
     public enum State {
         DISCONNECTED, CONNECTED, AUTHENTICATED
-    }
-
-    public enum Switch {
-        OFF("0"),
-        ON("1"),
-        MANUAL("manual"),
-        INTERRUPT("int");
-
-        private String command;
-
-        Switch(String command) {
-            this.command = command;
-        }
-
-        public String getCommand() {
-            return command;
-        }
     }
 
     /**
