@@ -6,6 +6,14 @@ NETIO is a series of smart sockets nd PDU (Power Distribution Unit) by
 
 This library gives you a Java-Interface to control them.
 
+Current State
+-------------
+
+This library is in a non stable state at the moment. The library on
+maven central can be used and uses a socket connection. The current
+main branch has changed to use a `http` connection, but it's not done
+yet.
+
 Example
 -------
 
