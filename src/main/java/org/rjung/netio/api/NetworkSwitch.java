@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 
+import org.rjung.netio.api.enums.ConnectionState;
 import org.rjung.netio.api.enums.Switch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,10 @@ public class NetworkSwitch {
 
     private String hash;
     private String session;
-    private State state;
+    private ConnectionState state;
 
     private NetworkSwitch(Builder builder) throws IOException {
-        this.state = State.DISCONNECTED;
+        this.state = ConnectionState.DISCONNECTED;
         this.username = builder.username;
         this.password = builder.password;
         this.client = HttpClient.newHttpClient();
@@ -68,7 +69,7 @@ public class NetworkSwitch {
      */
     public boolean isConnected() {
         LOG.trace("isConnected()");
-        return State.CONNECTED.equals(state);
+        return ConnectionState.CONNECTED.equals(state);
     }
 
     /**
@@ -78,12 +79,12 @@ public class NetworkSwitch {
      */
     public boolean isAuthenticated() {
         LOG.trace("isAuthorized()");
-        return State.AUTHENTICATED.equals(state);
+        return ConnectionState.AUTHENTICATED.equals(state);
     }
 
     public void connect() throws URISyntaxException, IOException, InterruptedException {
         String[] elements = call(
-                new URL(baseUrl, MessageFormat.format("/cgi/kshell.cgi?session=init+{0}", System.currentTimeMillis())))
+                new URL(baseUrl, MessageFormat.format("/cgi/kshell.cgi?session=init+{0,number,#}", System.currentTimeMillis())))
                 .split(" ");
         if ("250".equals(elements[0])) {
             for (int i = 1; i < elements.length; i++) {
@@ -96,7 +97,7 @@ public class NetworkSwitch {
                     LOG.warn("Unknown property {}={}", parts[0], parts[1]);
                 }
             }
-            this.state = State.CONNECTED;
+            this.state = ConnectionState.CONNECTED;
         }
     }
 
@@ -110,7 +111,7 @@ public class NetworkSwitch {
                         MessageDigest.getInstance("MD5").digest((username + password + hash).getBytes(StandardCharsets.US_ASCII))))))
                 .split(" ");
         if ("250".equals(elements[0])) {
-            this.state = State.AUTHENTICATED;
+            this.state = ConnectionState.AUTHENTICATED;
         }
     }
 
@@ -142,10 +143,6 @@ public class NetworkSwitch {
         return new String(hexChars, StandardCharsets.UTF_8);
     }
 
-    public enum State {
-        DISCONNECTED, CONNECTED, AUTHENTICATED
-    }
-
     /**
      * Informal retrieval (also for testing) of the base URL.
      *
@@ -157,11 +154,11 @@ public class NetworkSwitch {
     }
 
     /**
-     * Informal retrieval of the current {@link State} of the {@link NetworkSwitch}.
+     * Informal retrieval of the current {@link ConnectionState} of the {@link NetworkSwitch}.
      *
-     * @return The currenr {@link State} of the {@link NetworkSwitch}
+     * @return The currenr {@link ConnectionState} of the {@link NetworkSwitch}
      */
-    public State getState() {
+    public ConnectionState getState() {
         return state;
     }
 
