@@ -10,18 +10,17 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
+import java.util.logging.Logger;
 
 import org.rjung.netio.api.enums.ConnectionState;
 import org.rjung.netio.api.enums.Switch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
 public class NetworkSwitch {
 
     private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes();
-    private static final Logger LOG = LoggerFactory.getLogger(NetworkSwitch.class);
+    private static final Logger LOG = Logger.getLogger(NetworkSwitch.class.getSimpleName());
     public static final int DEFAULT_PORT = 80;
 
     private final String username;
@@ -68,7 +67,7 @@ public class NetworkSwitch {
      * @return <tt>false</tt>, if no connection was started
      */
     public boolean isConnected() {
-        LOG.trace("isConnected()");
+        LOG.finer("isConnected()");
         return ConnectionState.CONNECTED.equals(state);
     }
 
@@ -78,7 +77,7 @@ public class NetworkSwitch {
      * @return <tt>false</tt>, if no connection was authenticated
      */
     public boolean isAuthenticated() {
-        LOG.trace("isAuthorized()");
+        LOG.finer("isAuthorized()");
         return ConnectionState.AUTHENTICATED.equals(state);
     }
 
@@ -94,7 +93,7 @@ public class NetworkSwitch {
                 } else if ("ssid".equals(parts[0])) {
                     this.session = parts[1];
                 } else {
-                    LOG.warn("Unknown property {}={}", parts[0], parts[1]);
+                    LOG.warning(MessageFormat.format("Unknown property {0}={1}", parts[0], parts[1]));
                 }
             }
             this.state = ConnectionState.CONNECTED;
@@ -124,7 +123,7 @@ public class NetworkSwitch {
                 MessageFormat.format("/cgi/kshell.cgi?session=ssid+{0}&cmd=port+{1}+{2}", this.session, light, state.getCommand())))
                 .split(" ");
         if ("250".equals(elements[0])) {
-            LOG.debug("OK");
+            LOG.fine("OK");
         }
     }
 
