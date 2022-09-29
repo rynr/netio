@@ -22,6 +22,9 @@ This library is in a non stable state at the moment. The library on maven
 central can be used and uses a socket connection. The current main branch has
 changed to use a `http` connection, but it's not done yet.
 
+Unfortunately I don't own a device any more, so I cannot test this is working.
+I'd love to get a response that this is working, so I can make a new release.
+
 Example
 -------
 
